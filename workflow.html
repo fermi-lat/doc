@@ -88,7 +88,10 @@
               <p class="caption"><span class="caption-text">Processes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Development Workflow with Git, GitHub, and Jenkins</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#git-and-repoman-setup">Git and repoman setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#git-and-repoman-setup">Git and repoman setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repoman">Repoman</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#fermi-lat-github-organization">fermi-lat GitHub Organization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id1">fermi-lat GitHub organization</a></li>
 </ul>
@@ -105,20 +108,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#make-a-pull-request">Make a pull request</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#dm-code-review-and-merging-process">DM Code Review and Merging Process</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#code-review-and-merging-process">Code Review and Merging Process</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#the-scope-and-purpose-of-code-review">The scope and purpose of code review</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#assign-a-reviewer">Assign a reviewer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#code-review-discussion">Code review discussion</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#using-github-pull-requests">Using GitHub pull requests</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#resolving-a-review">Resolving a review</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#resolving-with-multiple-reviewers">Resolving with multiple reviewers</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#merging">Merging</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#fixing-a-breakage-on-master">Fixing a breakage on master</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#announce-the-change">Announce the change</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#appendix-commit-organization-best-practices">Appendix: Commit Organization Best Practices</a><ul>
@@ -216,9 +215,47 @@
 <li><span class="xref std std-ref">Set Git and GitHub to use your institution-hosted email address</span>.</li>
 <li><span class="xref std std-ref">Set Git to use &#8216;plain&#8217; pushes</span>.</li>
 </ol>
-<p>For</p>
-<p>It will, it can modify your existing working directory. You might need to do a <code class="docutils literal"><span class="pre">--force</span></code></p>
-<p>By default, it will fail if there are changes in your working copy (that way it doesn&#8217;t accidentally blow out work you&#8217;ve maybe done developing and haven&#8217;t committed).</p>
+<div class="section" id="repoman">
+<h3>Repoman<a class="headerlink" href="#repoman" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://fermi-lat.github.io/repoman">repoman</a> is a tool
+to coordinate checking out multiple branches across multiple
+repositories, as well as checking out the exact state of a given
+container tag, for example. It&#8217;s the main way you will perform a
+checkout of everything needed to build ScienceTools or
+GlastRelease. Please consult the repoman documentation for more
+information on how to use it.</p>
+<p>In general, you will use repoman when you need to check everything out
+for compiling, especially when you need to checkout branches in
+multiple repositories. The CI jobs implemented in Jenkins also use
+repoman to perform a checkout whenever a Pull Request is created or
+modified.</p>
+<p>Some examples of checking out projects:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Checks out ScienceTools at master, reads packageList.txt verbatim</span>
+<span class="c1"># If the packageList.txt has a ref that&#39;s incorrect, checkout should fail</span>
+repoman checkout ScienceTools
+
+<span class="c1"># Checks out ScienceTools at master, reads packageList.txt verbatim</span>
+<span class="c1"># refs in packages named extlist override those in packageList.txt</span>
+repoman checkout ScienceTools extlist
+
+<span class="c1"># Checks out ScienceTools at ScienceTools-11-08-00</span>
+<span class="c1"># Reads packageList.txt verbatim at ScienceTools-11-08-00, refs named ScienceTools-11-08-00 override</span>
+<span class="c1"># If the packageList.txt has a ref that&#39;s incorrect, checkout should fail,</span>
+<span class="c1"># unless that package does have a tag for ScienceTools-11-08-00</span>
+repoman checkout ScienceTools ScienceTools-11-08-00
+
+<span class="c1"># ScienceTools has branch repoman_scons_reorg, it takes precedence over master.</span>
+<span class="c1"># Dependencies checked out according to their development branch (e.g. master)</span>
+<span class="c1"># If SconsShared has tag SConsShared-02-03-00 and branch extlist</span>
+<span class="c1"># SConsShared-02-03-00 takes precedence, so extlist is never checked out</span>
+repoman checkout ScienceTools --develop --force SConsShared-02-03-00 extlist repoman_scons_reorg
+</pre></div>
+</div>
+<p>By default, repoman will fail if there are changes in your working
+copy (that way it doesn&#8217;t accidentally blow out work you&#8217;ve maybe done
+developing and haven&#8217;t committed). You will likely want to stash or
+reset your repo and then try the checkout again or perform a <code class="docutils literal"><span class="pre">--force</span></code>.</p>
+</div>
 </div>
 <div class="section" id="fermi-lat-github-organization">
 <span id="github-org"></span><h2>fermi-lat GitHub Organization<a class="headerlink" href="#fermi-lat-github-organization" title="Permalink to this headline">¶</a></h2>
@@ -245,7 +282,8 @@ Development is not done directly on the <code class="docutils literal"><span cla
 <p>Documentation edits and additions are the only scenarios where working directly on <code class="docutils literal"><span class="pre">master</span></code> and by-passing the code review process is permitted.
 In most cases, documentation writing benefits from peer editing (code review) and <em>can</em> be done on a ticket branch.</p>
 <p>The Git history of <code class="docutils literal"><span class="pre">master</span></code> <strong>must never be re-written</strong> with force pushes.
-We don&#8217;t have branch protection on, but this may change, preventing force pushes.</p>
+We don&#8217;t have branch protection on, but this may change, preventing
+force pushes.</p>
 </div>
 <div class="section" id="user-branches">
 <span id="git-branch-user"></span><h3>User branches<a class="headerlink" href="#user-branches" title="Permalink to this headline">¶</a></h3>
@@ -260,15 +298,24 @@ Before offering unsolicited code review on your colleagues&#8217; user branches,
 </div>
 <div class="section" id="ticket-branches">
 <span id="git-branch-ticket"></span><h3>Ticket branches<a class="headerlink" href="#ticket-branches" title="Permalink to this headline">¶</a></h3>
-<p>Ticket branches are associated with a JIRA ticket.
-Only ticket branches can be merged into <code class="docutils literal"><span class="pre">master</span></code>.
-(In other words, developing on a ticket branch is the only way to record earned value for code development.)</p>
-<p>If the JIRA ticket is named <code class="docutils literal"><span class="pre">DM-NNNN</span></code>, then the ticket branch will be named</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>tickets/DM-NNNN
+<p>If you are using Jira to track your work, we recommend you consider using
+ticket branches.</p>
+<p>Ticket branches are associated with a Jira ticket. SLAC&#8217;s Jira is
+integrate so that you may view a ticket and see any pull
+requests, commits, or branches in github related to that ticket,
+provided the Jira ticket ID is in the branch name (in the case of
+branches, commits, and pull requests) or in the commit message, for
+commits.</p>
+<p>If the Jira ticket is named <code class="docutils literal"><span class="pre">GRINF-NN</span></code>, then the ticket branch will be named:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>GRINF-NN
 </pre></div>
 </div>
-<p>A ticket branch can be made by branching off an existing user branch.
-This is a great way to formalize and shape experimental work into an LSST software contribution.</p>
+<p>You may also add additional text to the branch name as well. A full
+branch name might look something like the following:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>GRINF-79_st_user_support
+</pre></div>
+</div>
+<p>A ticket branch can be made by branching off an existing user branch.</p>
 <p>When code on a ticket branch is ready for review and merging, follow the <a class="reference internal" href="#workflow-code-review"><span class="std std-ref">code review process documentation</span></a>.</p>
 </div>
 </div>
@@ -282,7 +329,7 @@ This section describes how to prepare your work for review.</p>
 A common pattern is:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git checkout master
 git pull
-git checkout tickets/DM-NNNN
+git checkout GRINF-NN
 git rebase -i master
 <span class="c1"># interactive rebase</span>
 git push --force
@@ -294,13 +341,6 @@ git push --force
 <p>Use <a class="reference external" href="https://srs.slac.stanford.edu/hudson">Jenkins at srs.slac.stanford.edu/hudson</a> to run a build based on your branch work.
 To log into Jenkins, you&#8217;ll need to ask for an account from &lt;who?&gt;.</p>
 <p>Jenkins finds, builds, and tests your work according to the name of your ticket branch; Stack repositories lacking your ticket branch will fall back to <code class="docutils literal"><span class="pre">master</span></code>.</p>
-<div class="figure" id="id3">
-<img alt="_static/development/jenkins_ci.png" src="_static/development/jenkins_ci.png" />
-<p class="caption"><span class="caption-text">Jenkins test submission screen.
-In this example, the <code class="docutils literal"><span class="pre">tickets/DM-9999</span></code> branches of Stack repositories will be tested.
-If that branch doesn&#8217;t exist, the <code class="docutils literal"><span class="pre">tickets/DM-9998</span></code> branch is be used.
-If neither of those branches exist for a given repository, the <code class="docutils literal"><span class="pre">master</span></code> branch is used.</span></p>
-</div>
 <p>You can monitor builds in the <a class="reference external" href="https://fermi-lat.slack.com/messages/jenkins">#jenkins</a> Slack channel.
 <strong>If your build failed,</strong> click on the <strong>Console</strong> link in the Slack message to see the build.</p>
 </div>
@@ -310,80 +350,48 @@ If neither of those branches exist for a given repository, the <code class="docu
 <p>The pull request&#8217;s description shouldn&#8217;t be exhaustive; only include information that will help frame the review.</p>
 </div>
 </div>
-<div class="section" id="dm-code-review-and-merging-process">
-<span id="workflow-code-review"></span><h2>DM Code Review and Merging Process<a class="headerlink" href="#dm-code-review-and-merging-process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="code-review-and-merging-process">
+<span id="workflow-code-review"></span><h2>Code Review and Merging Process<a class="headerlink" href="#code-review-and-merging-process" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="the-scope-and-purpose-of-code-review">
 <span id="workflow-review-purpose"></span><h3>The scope and purpose of code review<a class="headerlink" href="#the-scope-and-purpose-of-code-review" title="Permalink to this headline">¶</a></h3>
-<p>We review work before it is merged to ensure that code is maintainable and usable by someone other than the author.</p>
+<p>We recommend reviewing work before it is merged to ensure that code is
+maintainable and usable by someone other than the author. Typically,
+the package maintainer should be the reviewer.</p>
 <ul class="simple">
-<li>Is the code well commented, structured for clarity, and consistent with DM&#8217;s code style?</li>
+<li>Is the code well commented, structured for clarity, and consistent?</li>
 <li>Is there adequate unit test coverage for the code?</li>
 <li>Is the documentation augmented or updated to be consistent with the code changes?</li>
 <li>Are the Git commits well organized and well annotated to help future developers understand the code development?</li>
 </ul>
-<p>Code reviews should also address whether the code fulfills design and performance requirements.</p>
-<p>Ideally the code review <em>should not be a design review.</em>
-Before serious coding effort is committed to a ticket, the developer should either undertake an informal design review while creating the JIRA story, or more formally use the <abbr title="Request for Comment">RFC</abbr> and <abbr title="Request for Discussion">RFD</abbr> processes (see <span class="xref doc">/processes/decision_process</span>) for key design decisions.</p>
-</div>
-<div class="section" id="assign-a-reviewer">
-<span id="workflow-review-assign"></span><h3>Assign a reviewer<a class="headerlink" href="#assign-a-reviewer" title="Permalink to this headline">¶</a></h3>
-<p>On your ticket&#8217;s JIRA page, use the <strong>Workflow</strong> button to switch the ticket&#8217;s state to <strong>In Review</strong>.
-JIRA will ask you to assign reviewers.</p>
-<p>In your JIRA message requesting review, indicate how involved the review work will be (&#8220;quick&#8221; or &#8220;not quick&#8221;).
-The reviewer should promptly acknowledge the request, indicate whether they can do the review, and give a timeline for when they will be able to accomplish the request.
-This allows the developer to seek an alternate reviewer if necessary.</p>
-<p>Any team member in Data Management can review code; it is perfectly fine to draw reviewers from any segment of DM.
-For major changes, it is good to choose someone more experienced than yourself.
-For minor changes, it may be good to choose someone less experienced than yourself.
-For large changes, more than one reviewer may be assigned, possibly split by area of the code.
-In this case, establish in the review request what each reviewer is responsible for.</p>
-<p><strong>Do not assign multiple reviewers as a way of finding someone to review your work more quickly.</strong>
-It is better to communicate directly with potential reviewers directly to ascertain their availability.</p>
-<p>Code reviews performed by peers are useful for a number of reasons:</p>
-<ul class="simple">
-<li>Peers are a good proxy for maintainability.</li>
-<li>It&#8217;s useful for everyone to be familiar with other parts of the system.</li>
-<li>Good practices can be spread; bad practices can be deprecated.</li>
-</ul>
-<p>All developers are expected to make time to perform reviews.
-The System Architect can intervene, however, if a developer is overburdened with review responsibility.</p>
+<p>Ideally you aren&#8217;t reviewing your own code, but if you must, please
+follow those guidelines. Discussion may be performed in Github, which
+can help capture intent, but feel free to use Slack for higher
+bandwidth/lower latency discussions.</p>
 </div>
 <div class="section" id="code-review-discussion">
 <span id="workflow-code-review-process"></span><h3>Code review discussion<a class="headerlink" href="#code-review-discussion" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="using-github-pull-requests">
 <h4>Using GitHub pull requests<a class="headerlink" href="#using-github-pull-requests" title="Permalink to this headline">¶</a></h4>
-<p>Code review discussion should happen on the GitHub pull request, with the reviewer giving a discussion summary and conclusive thumbs-up on the JIRA ticket.</p>
+<p>Code reviews are a collaborative check-and-improve process.
+Reviewers do not hold absolute authority, nor can developers ignore
+the reviewer&#8217;s suggestions.
+The aim is to discuss, iterate, and improve the pull request until the work is ready to be deployed on <code class="docutils literal"><span class="pre">master</span></code>.</p>
+<p>Code review discussion should happen on the GitHub pull request, with
+the reviewer giving a discussion summary and conclusive thumbs-up on
+the Jira ticket.</p>
 <p>When conducting an extensive code review in a PR, reviewers should use GitHub&#8217;s <a class="reference external" href="github-review">&#8220;Start a review&#8221; feature</a>.
 This mode lets the reviewer queue multiple comments that are only sent once the review is submitted.
-Note that GitHub allows a reviewer to classify a code review: &#8220;Comment,&#8221; &#8220;Approve,&#8221; or &#8220;Request changes.&#8221;
-While useful, this feature doesn&#8217;t replace JIRA for formally <a class="reference internal" href="#workflow-resolving-review"><span class="std std-ref">marking a ticket as being reviewed</span></a>.</p>
+Note that GitHub allows a reviewer to classify a code review: &#8220;Comment,&#8221; &#8220;Approve,&#8221; or &#8220;Request changes.&#8221;</p>
 <p>Reviewers should use GitHub&#8217;s <a class="reference external" href="https://help.github.com/articles/commenting-on-a-pull-request/#adding-line-comments-to-a-pull-request">line comments</a> to discuss specific pieces of code.
 As line comments are addressed, the developer may use GitHub&#8217;s <a class="reference external" href="https://help.github.com/articles/about-discussions-in-issues-and-pull-requests/">emoji reactions</a> to indicate that the work is done (the &#8220;👍&#8221; works well).
 Responding to each line comment isn&#8217;t required, but it can help a developer track progress in addressing comments.
 We discourage replies that merely say &#8220;Done&#8221; since <em>text</em> replies generate email traffic; emoji reactions aren&#8217;t emailed.
 Of course, use text replies if a discussion is required.</p>
-<div class="figure" id="id4">
+<div class="figure" id="id3">
 <img alt="_static/processes/workflow/reaction&#64;2x.gif" src="_static/processes/workflow/reaction&#64;2x.gif" />
 <p class="caption"><span class="caption-text">GitHub PR reactions are recommended for checking off completion of individual comments.</span></p>
 </div>
 <p>Another effective way to track progress towards addressing general review comments is with <a class="reference external" href="https://help.github.com/articles/about-task-lists/">Markdown task lists</a>.</p>
-</div>
-<div class="section" id="resolving-a-review">
-<span id="workflow-resolving-review"></span><h4>Resolving a review<a class="headerlink" href="#resolving-a-review" title="Permalink to this headline">¶</a></h4>
-<p>Code reviews are a collaborative check-and-improve process.
-Reviewers do not hold absolute authority, nor can developers ignore the reviewer&#8217;s suggestions.
-The aim is to discuss, iterate, and improve the pull request until the work is ready to be deployed on <code class="docutils literal"><span class="pre">master</span></code>.</p>
-<p>If the review becomes stuck on a design decision, that aspect of the review can be elevated into an RFC to seek team-wide consensus.</p>
-<p>If an issue is outside the ticket&#8217;s scope, the reviewer should file a new ticket.</p>
-<p>Once the iterative review process is complete, the reviewer should switch the JIRA ticket&#8217;s state to <strong>Reviewed</strong>.</p>
-<p>Note that in many cases the reviewer will mark a ticket as <strong>Reviewed</strong> before seeing the requested changes implemented.
-This convention is used when the review comments are non-controversial; the developer can simply implement the necessary changes and self-merge.
-The reviewer does not need to be consulted for final approval in this case.</p>
-</div>
-<div class="section" id="resolving-with-multiple-reviewers">
-<h4>Resolving with multiple reviewers<a class="headerlink" href="#resolving-with-multiple-reviewers" title="Permalink to this headline">¶</a></h4>
-<p>If there are multiple reviewers, our convention is that each review removes their name from the Reviewers list to indicate sign-off; the final reviewer switches the status to <strong>Reviewed.</strong>
-This indicates the ticket is ready to be merged.</p>
 </div>
 </div>
 <div class="section" id="merging">
@@ -396,26 +404,17 @@ If a rebase was required, a final check with Jenkins should be done.</p>
 <p>We <strong>always use non-fast forward merges</strong> so that the merge point is marked in Git history, with the merge commit containing the ticket number:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git checkout master
 git pull  <span class="c1"># Sanity check; rebase ticket if master was updated.</span>
-git merge --no-ff tickets/DM-NNNN
+git merge --no-ff GRINF-NN
 git push
 </pre></div>
 </div>
-<p><strong>GitHub pull request pages also offer a &#8216;big green button&#8217; for merging a branch to master</strong>.
-We discourage you from using this button since there isn&#8217;t a convenient way of knowing that the merged development history graph will be linear from GitHub&#8217;s interface.
-Rebasing the ticket branch against <code class="docutils literal"><span class="pre">master</span></code> and doing the non-fast forward merging on the command line is the safest workflow.</p>
-<p>The ticket branch <strong>should not</strong> be deleted from the GitHub remote.</p>
+<p>The ticket branch may be deleted from the GitHub remote at the time of
+merge. You may want to keep it around for a bit too, use your discretion.</p>
 <div class="section" id="fixing-a-breakage-on-master">
 <span id="workflow-fixing-breakage-master"></span><h4>Fixing a breakage on master<a class="headerlink" href="#fixing-a-breakage-on-master" title="Permalink to this headline">¶</a></h4>
 <p>In rare cases, despite the pre-merge integration testing process described <a class="reference internal" href="#workflow-testing"><span class="std std-ref">above</span></a>, a merge to master might accidentally contain an error and &#8220;break the build&#8221;.
 If this occurs, the merge may be reverted by anyone who notices the breakage and verifies that the merge is the cause &#8211; unless a fix can be created, tested, reviewed, and merged very promptly.</p>
 </div>
-</div>
-<div class="section" id="announce-the-change">
-<span id="workflow-announce"></span><h3>Announce the change<a class="headerlink" href="#announce-the-change" title="Permalink to this headline">¶</a></h3>
-<p>Once the merge has been completed, the developer should mark the JIRA ticket as <strong>Done</strong>.
-If this ticket adds a significant feature or fixes a significant bug, it should be announced in the <a class="reference external" href="https://community.lsst.org/c/dm/dm-notifications">DM Notifications category</a> of community.lsst.org with tag <a class="reference external" href="https://community.lsst.org/tags/dm-dev">dm-dev</a>.
-In addition, if this update affects users, a short description of its effects from the user point of view should be prepared for the release notes that accompany each major release.
-(Release notes are currently collected via team-specific procedures.)</p>
 </div>
 </div>
 <div class="section" id="appendix-commit-organization-best-practices">
@@ -467,7 +466,7 @@ For example, it is useful to prefix the commit summary with the area of code bei
 <p><strong>The message body should be wrapped at 72 character line lengths</strong>, and contain lists or paragraphs that explain the code changes.
 The commit message body describes:</p>
 <ul class="simple">
-<li>What the original issue was; the reader shouldn&#8217;t have to look at JIRA to understand what prompted the code change.</li>
+<li>What the original issue was</li>
 <li>What the changes actually are and why they were made.</li>
 <li>What the limitations of the code are. This is especially useful for future debugging.</li>
 </ul>

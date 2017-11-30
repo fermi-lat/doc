@@ -24,11 +24,52 @@ Follow these steps to configure your Git environment for DM work:
 1. :ref:`Set Git and GitHub to use your institution-hosted email address <git-setup-institutional-email>`.
 2. :ref:`Set Git to use 'plain' pushes <git-setup-plain-pushes>`.
 
-For
+Repoman
+-------
 
-It will, it can modify your existing working directory. You might need to do a ``--force``
+`repoman <https://fermi-lat.github.io/repoman>`__ is a tool 
+to coordinate checking out multiple branches across multiple
+repositories, as well as checking out the exact state of a given
+container tag, for example. It's the main way you will perform a
+checkout of everything needed to build ScienceTools or
+GlastRelease. Please consult the repoman documentation for more
+information on how to use it.
 
-By default, it will fail if there are changes in your working copy (that way it doesn't accidentally blow out work you've maybe done developing and haven't committed).
+In general, you will use repoman when you need to check everything out
+for compiling, especially when you need to checkout branches in
+multiple repositories. The CI jobs implemented in Jenkins also use
+repoman to perform a checkout whenever a Pull Request is created or
+modified.
+
+Some examples of checking out projects:
+
+.. code-block:: bash
+
+   # Checks out ScienceTools at master, reads packageList.txt verbatim
+   # If the packageList.txt has a ref that's incorrect, checkout should fail
+   repoman checkout ScienceTools
+
+   # Checks out ScienceTools at master, reads packageList.txt verbatim
+   # refs in packages named extlist override those in packageList.txt
+   repoman checkout ScienceTools extlist 
+
+   # Checks out ScienceTools at ScienceTools-11-08-00
+   # Reads packageList.txt verbatim at ScienceTools-11-08-00, refs named ScienceTools-11-08-00 override
+   # If the packageList.txt has a ref that's incorrect, checkout should fail,
+   # unless that package does have a tag for ScienceTools-11-08-00
+   repoman checkout ScienceTools ScienceTools-11-08-00  
+
+   # ScienceTools has branch repoman_scons_reorg, it takes precedence over master.
+   # Dependencies checked out according to their development branch (e.g. master)
+   # If SconsShared has tag SConsShared-02-03-00 and branch extlist
+   # SConsShared-02-03-00 takes precedence, so extlist is never checked out
+   repoman checkout ScienceTools --develop --force SConsShared-02-03-00 extlist repoman_scons_reorg
+
+By default, repoman will fail if there are changes in your working
+copy (that way it doesn't accidentally blow out work you've maybe done
+developing and haven't committed). You will likely want to stash or
+reset your repo and then try the checkout again or perform a ``--force``.
+
 
 .. _github-org:
 
@@ -69,7 +110,8 @@ Documentation edits and additions are the only scenarios where working directly 
 In most cases, documentation writing benefits from peer editing (code review) and *can* be done on a ticket branch.
 
 The Git history of ``master`` **must never be re-written** with force pushes.
-We don't have branch protection on, but this may change, preventing force pushes.
+We don't have branch protection on, but this may change, preventing
+force pushes.
 
 .. _git-branch-user:
 
@@ -94,18 +136,30 @@ Developers can feel free to rebase and force push work to their personal user br
 Ticket branches
 ---------------
 
-Ticket branches are associated with a JIRA ticket.
-Only ticket branches can be merged into ``master``.
-(In other words, developing on a ticket branch is the only way to record earned value for code development.)
+If you are using Jira to track your work, we recommend you consider using
+ticket branches.
 
-If the JIRA ticket is named ``DM-NNNN``, then the ticket branch will be named
+Ticket branches are associated with a Jira ticket. SLAC's Jira is
+integrate so that you may view a ticket and see any pull
+requests, commits, or branches in github related to that ticket,
+provided the Jira ticket ID is in the branch name (in the case of
+branches, commits, and pull requests) or in the commit message, for
+commits.
+
+If the Jira ticket is named ``GRINF-NN``, then the ticket branch will be named:
 
 .. code-block:: text
 
-   tickets/DM-NNNN
+   GRINF-NN
+
+You may also add additional text to the branch name as well. A full
+branch name might look something like the following:
+
+.. code-block:: text
+
+   GRINF-79_st_user_support
 
 A ticket branch can be made by branching off an existing user branch.
-This is a great way to formalize and shape experimental work into an LSST software contribution.
 
 When code on a ticket branch is ready for review and merging, follow the :ref:`code review process documentation <workflow-code-review>`.
 
@@ -129,12 +183,12 @@ A common pattern is:
 
    git checkout master
    git pull
-   git checkout tickets/DM-NNNN
+   git checkout GRINF-NN
    git rebase -i master
    # interactive rebase
    git push --force
 
-.. _workflow-testing:
+.. _Workflow-testing:
 
 Testing with Jenkins
 --------------------
@@ -143,13 +197,6 @@ Use `Jenkins at srs.slac.stanford.edu/hudson <https://srs.slac.stanford.edu/huds
 To log into Jenkins, you'll need to ask for an account from <who?>.
 
 Jenkins finds, builds, and tests your work according to the name of your ticket branch; Stack repositories lacking your ticket branch will fall back to ``master``.
-
-.. figure:: /_static/development/jenkins_ci.png
-
-   Jenkins test submission screen.
-   In this example, the ``tickets/DM-9999`` branches of Stack repositories will be tested.
-   If that branch doesn't exist, the ``tickets/DM-9998`` branch is be used.
-   If neither of those branches exist for a given repository, the ``master`` branch is used.
 
 You can monitor builds in the `#jenkins <https://fermi-lat.slack.com/messages/jenkins>`_ Slack channel.
 **If your build failed,** click on the **Console** link in the Slack message to see the build.
@@ -165,59 +212,28 @@ The pull request's description shouldn't be exhaustive; only include information
 
 .. _workflow-code-review:
 
-DM Code Review and Merging Process
-==================================
+Code Review and Merging Process
+===============================
 
 .. _workflow-review-purpose:
 
 The scope and purpose of code review
 ------------------------------------
 
-We review work before it is merged to ensure that code is maintainable and usable by someone other than the author.
+We recommend reviewing work before it is merged to ensure that code is
+maintainable and usable by someone other than the author. Typically,
+the package maintainer should be the reviewer. 
 
-- Is the code well commented, structured for clarity, and consistent with DM's code style?
+- Is the code well commented, structured for clarity, and consistent?
 - Is there adequate unit test coverage for the code?
 - Is the documentation augmented or updated to be consistent with the code changes?
 - Are the Git commits well organized and well annotated to help future developers understand the code development?
 
-.. well- hyphenation? no http://english.stackexchange.com/a/65632
+Ideally you aren't reviewing your own code, but if you must, please
+follow those guidelines. Discussion may be performed in Github, which
+can help capture intent, but feel free to use Slack for higher
+bandwidth/lower latency discussions.
 
-Code reviews should also address whether the code fulfills design and performance requirements.
-
-Ideally the code review *should not be a design review.*
-Before serious coding effort is committed to a ticket, the developer should either undertake an informal design review while creating the JIRA story, or more formally use the :abbr:`RFC (Request for Comment)` and :abbr:`RFD (Request for Discussion)` processes (see :doc:`/processes/decision_process`) for key design decisions.
-
-.. TODO: link to RFC/RFC process doc
-
-.. _workflow-review-assign:
-
-Assign a reviewer
------------------
-
-On your ticket's JIRA page, use the **Workflow** button to switch the ticket's state to **In Review**.
-JIRA will ask you to assign reviewers.
-
-In your JIRA message requesting review, indicate how involved the review work will be ("quick" or "not quick").
-The reviewer should promptly acknowledge the request, indicate whether they can do the review, and give a timeline for when they will be able to accomplish the request.
-This allows the developer to seek an alternate reviewer if necessary.
-
-Any team member in Data Management can review code; it is perfectly fine to draw reviewers from any segment of DM.
-For major changes, it is good to choose someone more experienced than yourself.
-For minor changes, it may be good to choose someone less experienced than yourself.
-For large changes, more than one reviewer may be assigned, possibly split by area of the code.
-In this case, establish in the review request what each reviewer is responsible for.
-
-**Do not assign multiple reviewers as a way of finding someone to review your work more quickly.**
-It is better to communicate directly with potential reviewers directly to ascertain their availability.
-
-Code reviews performed by peers are useful for a number of reasons:
-
-- Peers are a good proxy for maintainability.
-- It's useful for everyone to be familiar with other parts of the system.
-- Good practices can be spread; bad practices can be deprecated.
-
-All developers are expected to make time to perform reviews.
-The System Architect can intervene, however, if a developer is overburdened with review responsibility.
 
 .. _workflow-code-review-process:
 
@@ -227,12 +243,18 @@ Code review discussion
 Using GitHub pull requests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Code review discussion should happen on the GitHub pull request, with the reviewer giving a discussion summary and conclusive thumbs-up on the JIRA ticket.
+Code reviews are a collaborative check-and-improve process.
+Reviewers do not hold absolute authority, nor can developers ignore
+the reviewer's suggestions.
+The aim is to discuss, iterate, and improve the pull request until the work is ready to be deployed on ``master``.
+
+Code review discussion should happen on the GitHub pull request, with
+the reviewer giving a discussion summary and conclusive thumbs-up on
+the Jira ticket.
 
 When conducting an extensive code review in a PR, reviewers should use GitHub's `"Start a review" feature <github-review>`_.
 This mode lets the reviewer queue multiple comments that are only sent once the review is submitted.
 Note that GitHub allows a reviewer to classify a code review: "Comment," "Approve," or "Request changes."
-While useful, this feature doesn't replace JIRA for formally :ref:`marking a ticket as being reviewed <workflow-resolving-review>`.
 
 .. _github-review: https://help.github.com/articles/reviewing-proposed-changes-in-a-pull-request/
 
@@ -253,31 +275,6 @@ Another effective way to track progress towards addressing general review commen
 
 .. _Markdown task lists: https://help.github.com/articles/about-task-lists/
 
-.. _workflow-resolving-review:
-
-Resolving a review
-^^^^^^^^^^^^^^^^^^
-
-Code reviews are a collaborative check-and-improve process.
-Reviewers do not hold absolute authority, nor can developers ignore the reviewer's suggestions.
-The aim is to discuss, iterate, and improve the pull request until the work is ready to be deployed on ``master``.
-
-If the review becomes stuck on a design decision, that aspect of the review can be elevated into an RFC to seek team-wide consensus.
-
-If an issue is outside the ticket's scope, the reviewer should file a new ticket.
-
-Once the iterative review process is complete, the reviewer should switch the JIRA ticket's state to **Reviewed**.
-
-Note that in many cases the reviewer will mark a ticket as **Reviewed** before seeing the requested changes implemented.
-This convention is used when the review comments are non-controversial; the developer can simply implement the necessary changes and self-merge.
-The reviewer does not need to be consulted for final approval in this case.
-
-Resolving with multiple reviewers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If there are multiple reviewers, our convention is that each review removes their name from the Reviewers list to indicate sign-off; the final reviewer switches the status to **Reviewed.**
-This indicates the ticket is ready to be merged.
-
 .. _workflow-code-review-merge:
 
 Merging
@@ -295,14 +292,11 @@ We **always use non-fast forward merges** so that the merge point is marked in G
 
    git checkout master
    git pull  # Sanity check; rebase ticket if master was updated.
-   git merge --no-ff tickets/DM-NNNN
+   git merge --no-ff GRINF-NN
    git push
 
-**GitHub pull request pages also offer a 'big green button' for merging a branch to master**.
-We discourage you from using this button since there isn't a convenient way of knowing that the merged development history graph will be linear from GitHub's interface.
-Rebasing the ticket branch against ``master`` and doing the non-fast forward merging on the command line is the safest workflow.
-
-The ticket branch **should not** be deleted from the GitHub remote.
+The ticket branch may be deleted from the GitHub remote at the time of
+merge. You may want to keep it around for a bit too, use your discretion.
 
 .. _workflow-fixing-breakage-master:
 
@@ -311,16 +305,6 @@ Fixing a breakage on master
 
 In rare cases, despite the pre-merge integration testing process described :ref:`above <workflow-testing>`, a merge to master might accidentally contain an error and "break the build".
 If this occurs, the merge may be reverted by anyone who notices the breakage and verifies that the merge is the cause -- unless a fix can be created, tested, reviewed, and merged very promptly.
-
-.. _workflow-announce:
-
-Announce the change
--------------------
-
-Once the merge has been completed, the developer should mark the JIRA ticket as **Done**.
-If this ticket adds a significant feature or fixes a significant bug, it should be announced in the `DM Notifications category <https://community.lsst.org/c/dm/dm-notifications>`_ of community.lsst.org with tag `dm-dev <https://community.lsst.org/tags/dm-dev>`_.
-In addition, if this update affects users, a short description of its effects from the user point of view should be prepared for the release notes that accompany each major release.
-(Release notes are currently collected via team-specific procedures.)
 
 .. _git-commit-organization-best-practices:
 
@@ -391,7 +375,7 @@ Writing commit message body content
 **The message body should be wrapped at 72 character line lengths**, and contain lists or paragraphs that explain the code changes.
 The commit message body describes:
 
-- What the original issue was; the reader shouldn't have to look at JIRA to understand what prompted the code change.
+- What the original issue was
 - What the changes actually are and why they were made.
 - What the limitations of the code are. This is especially useful for future debugging.
 
@@ -404,4 +388,4 @@ The code reviewer is responsible for giving feedback on the adequacy of commit m
 
 The `OpenStack docs have excellent thoughts on writing great commit messages <https://wiki.openstack.org/wiki/GitCommitMessages#Information_in_commit_messages>`_.
 
-.. _JIRA: https://jira.lsstcorp.org/
+.. _Jira: https://jira.slac.stanford.edu/
