@@ -92,10 +92,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#repoman">Repoman</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#fermi-lat-github-organization">fermi-lat GitHub Organization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">fermi-lat GitHub organization</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#fermi-lat-github-organization">fermi-lat GitHub Organization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#git-branching-policy">Git Branching Policy</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#the-master-branch">The master branch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#user-branches">User branches</a></li>
@@ -263,11 +260,6 @@ reset your repo and then try the checkout again or perform a <code class="docuti
 <a class="reference external" href="https://github.com/fermi-lat">fermi-lat</a>.</p>
 <p>You should already be a member of the <a class="reference external" href="https://github.com/fermi-lat">fermi-lat</a> GitHub organization.
 If you cannot create repositories or push to repositories there, you need to be added to the organization. You may contact &lt;who?&gt; for access.</p>
-<div class="section" id="id1">
-<h3>fermi-lat GitHub organization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>The <a class="reference external" href="https://github.com/lsst">lsst</a> GitHub organization is for public-facing code and documentation repositories.
-Specifically, packages in main EUPS distributions are available from the <a class="reference external" href="https://github.com/lsst">lsst</a> organization, along with official documents (including LDM design documentation).</p>
-</div>
 </div>
 <div class="section" id="git-branching-policy">
 <span id="git-branching"></span><h2>Git Branching Policy<a class="headerlink" href="#git-branching-policy" title="Permalink to this headline">¶</a></h2>
@@ -320,7 +312,7 @@ branch name might look something like the following:</p>
 </div>
 </div>
 <div class="section" id="review-preparation">
-<span id="id2"></span><h2>Review Preparation<a class="headerlink" href="#review-preparation" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Review Preparation<a class="headerlink" href="#review-preparation" title="Permalink to this headline">¶</a></h2>
 <p>When development on your ticket branch is complete, we use a standard process for reviewing and merging your work.
 This section describes how to prepare your work for review.</p>
 <div class="section" id="pushing-code">
@@ -387,7 +379,7 @@ As line comments are addressed, the developer may use GitHub&#8217;s <a class="r
 Responding to each line comment isn&#8217;t required, but it can help a developer track progress in addressing comments.
 We discourage replies that merely say &#8220;Done&#8221; since <em>text</em> replies generate email traffic; emoji reactions aren&#8217;t emailed.
 Of course, use text replies if a discussion is required.</p>
-<div class="figure" id="id3">
+<div class="figure" id="id2">
 <img alt="_static/processes/workflow/reaction&#64;2x.gif" src="_static/processes/workflow/reaction&#64;2x.gif" />
 <p class="caption"><span class="caption-text">GitHub PR reactions are recommended for checking off completion of individual comments.</span></p>
 </div>
@@ -458,7 +450,7 @@ Reserve the <code class="docutils literal"><span class="pre">git</span> <span cl
 Consider 50 characters as a hard limit; your summary will be truncated in the  GitHub UI otherwise.
 Write the message in the <strong>imperative</strong> tense, not the past tense.
 For example, &#8220;Add feature ...&#8221; and &#8220;Fix issue ...&#8221; rather than &#8220;Added feature...&#8221; and &#8220;Fixed feature....&#8221;
-Ensure the summary line contains the right keywords so that someone examining <a class="reference external" href="https://github.com/lsst/afw/commits/master">a commit listing</a> can understand what parts of the codebase are being changed.
+Ensure the summary line contains the right keywords so that someone examining can understand what parts of the codebase are being changed.
 For example, it is useful to prefix the commit summary with the area of code being addressed.</p>
 </div>
 <div class="section" id="writing-commit-message-body-content">
