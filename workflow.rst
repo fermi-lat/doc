@@ -82,11 +82,6 @@ Fermi's Git repositories are available from the main GitHub organization,
 You should already be a member of the `fermi-lat <https://github.com/fermi-lat>`__ GitHub organization.
 If you cannot create repositories or push to repositories there, you need to be added to the organization. You may contact <who?> for access.
 
-fermi-lat GitHub organization
------------------------------
-
-The `lsst <https://github.com/lsst>`__ GitHub organization is for public-facing code and documentation repositories.
-Specifically, packages in main EUPS distributions are available from the `lsst <https://github.com/lsst>`__ organization, along with official documents (including LDM design documentation).
 
 .. _git-branching:
 
@@ -364,7 +359,7 @@ Writing commit summary lines
 Consider 50 characters as a hard limit; your summary will be truncated in the  GitHub UI otherwise.
 Write the message in the **imperative** tense, not the past tense.
 For example, "Add feature ..." and "Fix issue ..." rather than "Added feature..." and "Fixed feature...."
-Ensure the summary line contains the right keywords so that someone examining `a commit listing <https://github.com/lsst/afw/commits/master>`_ can understand what parts of the codebase are being changed.
+Ensure the summary line contains the right keywords so that someone examining can understand what parts of the codebase are being changed.
 For example, it is useful to prefix the commit summary with the area of code being addressed.
 
 .. _git-commit-message-body:
