@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Development Workflow with Git, GitHub, and Jenkins &mdash; Fermi Developer Documentation  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Fermi Developer Documentation  documentation" href="index.html"/>
+        <link rel="prev" title="Fermi Developer Guide" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fermi Developer Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Processes</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development Workflow with Git, GitHub, and Jenkins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#git-and-repoman-setup">Git and repoman setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fermi-lat-github-organization">fermi-lat GitHub Organization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">fermi-lat GitHub organization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#git-branching-policy">Git Branching Policy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-master-branch">The master branch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-branches">User branches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ticket-branches">Ticket branches</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#review-preparation">Review Preparation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pushing-code">Pushing code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-with-jenkins">Testing with Jenkins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#make-a-pull-request">Make a pull request</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dm-code-review-and-merging-process">DM Code Review and Merging Process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-scope-and-purpose-of-code-review">The scope and purpose of code review</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assign-a-reviewer">Assign a reviewer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-review-discussion">Code review discussion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-github-pull-requests">Using GitHub pull requests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resolving-a-review">Resolving a review</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resolving-with-multiple-reviewers">Resolving with multiple reviewers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#merging">Merging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fixing-a-breakage-on-master">Fixing a breakage on master</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#announce-the-change">Announce the change</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#appendix-commit-organization-best-practices">Appendix: Commit Organization Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#commits-should-represent-discrete-logical-changes-to-the-code">Commits should represent discrete logical changes to the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rebase-commits-from-code-reviews-rather-than-having-review-feedback-commits">Rebase commits from code reviews rather than having &#8216;review feedback&#8217; commits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#appendix-commit-message-best-practices">Appendix: Commit Message Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#writing-commit-summary-lines">Writing commit summary lines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-commit-message-body-content">Writing commit message body content</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fermi Developer Documentation</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Development Workflow with Git, GitHub, and Jenkins</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/workflow.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="development-workflow-with-git-github-and-jenkins">
+<h1>Development Workflow with Git, GitHub, and Jenkins<a class="headerlink" href="#development-workflow-with-git-github-and-jenkins" title="Permalink to this headline">¶</a></h1>
+<p>This page describes procedures for collaborating on Fermi software.</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#git-setup"><span class="std std-ref">Git and repoman for development</span></a>.</li>
+<li><a class="reference internal" href="#github-org"><span class="std std-ref">The fermi-lat GitHub organization</span></a>.</li>
+<li><a class="reference internal" href="#git-branching"><span class="std std-ref">Using Git branches</span></a>.</li>
+<li><a class="reference internal" href="#review-preparation"><span class="std std-ref">Code reviews</span></a>.</li>
+<li><a class="reference internal" href="#workflow-code-review"><span class="std std-ref">Merging code</span></a>.</li>
+<li><span class="xref std std-ref">Builds with Jenkins</span>.</li>
+<li><span class="xref std std-ref">Making a release</span>.</li>
+</ol>
+<div class="section" id="git-and-repoman-setup">
+<span id="git-setup"></span><h2>Git and repoman setup<a class="headerlink" href="#git-and-repoman-setup" title="Permalink to this headline">¶</a></h2>
+<p>It&#8217;s recommended you install Git version 1.9.5 or later.</p>
+<p>Follow these steps to configure your Git environment for DM work:</p>
+<ol class="arabic simple">
+<li><span class="xref std std-ref">Set Git and GitHub to use your institution-hosted email address</span>.</li>
+<li><span class="xref std std-ref">Set Git to use &#8216;plain&#8217; pushes</span>.</li>
+</ol>
+<p>For</p>
+<p>It will, it can modify your existing working directory. You might need to do a <code class="docutils literal"><span class="pre">--force</span></code></p>
+<p>By default, it will fail if there are changes in your working copy (that way it doesn&#8217;t accidentally blow out work you&#8217;ve maybe done developing and haven&#8217;t committed).</p>
+</div>
+<div class="section" id="fermi-lat-github-organization">
+<span id="github-org"></span><h2>fermi-lat GitHub Organization<a class="headerlink" href="#fermi-lat-github-organization" title="Permalink to this headline">¶</a></h2>
+<p>Fermi&#8217;s Git repositories are available from the main GitHub organization,
+<a class="reference external" href="https://github.com/fermi-lat">fermi-lat</a>.</p>
+<p>You should already be a member of the <a class="reference external" href="https://github.com/fermi-lat">fermi-lat</a> GitHub organization.
+If you cannot create repositories or push to repositories there, you need to be added to the organization. You may contact &lt;who?&gt; for access.</p>
+<div class="section" id="id1">
+<h3>fermi-lat GitHub organization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="https://github.com/lsst">lsst</a> GitHub organization is for public-facing code and documentation repositories.
+Specifically, packages in main EUPS distributions are available from the <a class="reference external" href="https://github.com/lsst">lsst</a> organization, along with official documents (including LDM design documentation).</p>
+</div>
+</div>
+<div class="section" id="git-branching-policy">
+<span id="git-branching"></span><h2>Git Branching Policy<a class="headerlink" href="#git-branching-policy" title="Permalink to this headline">¶</a></h2>
+<p>Rather than forking GitHub repositories, developers use a <em>shared repository model</em> by cloning repositories in the <a class="reference external" href="https://github.com/fermi-lat">fermi-lat</a> GitHub organization.
+Keep in mind that this means the GitHub <code class="docutils literal"><span class="pre">origin</span></code> remotes are shared, so branch names and git tags are shared.</p>
+<div class="section" id="the-master-branch">
+<span id="git-branch-integration"></span><h3>The master branch<a class="headerlink" href="#the-master-branch" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">master</span></code> is the main integration branch for our repositories.
+The master branch should always be stable and releaseable.
+In some circumstances, a <code class="docutils literal"><span class="pre">release</span></code> integration branch may be used. For example, we may want to have L1 branches for the L1 version of GlastRelease.
+Development is not done directly on the <code class="docutils literal"><span class="pre">master</span></code> branch, but instead on branches. Branches usually should go through a pull request before merging.</p>
+<p>Documentation edits and additions are the only scenarios where working directly on <code class="docutils literal"><span class="pre">master</span></code> and by-passing the code review process is permitted.
+In most cases, documentation writing benefits from peer editing (code review) and <em>can</em> be done on a ticket branch.</p>
+<p>The Git history of <code class="docutils literal"><span class="pre">master</span></code> <strong>must never be re-written</strong> with force pushes.
+We don&#8217;t have branch protection on, but this may change, preventing force pushes.</p>
+</div>
+<div class="section" id="user-branches">
+<span id="git-branch-user"></span><h3>User branches<a class="headerlink" href="#user-branches" title="Permalink to this headline">¶</a></h3>
+<p>It&#8217;s sometimes convenient to do experimental, proof-of-concept work in &#8216;user branches.&#8217;</p>
+<p>These branches might be named as follows:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>u/{{username}}/{{topic}}
+</pre></div>
+</div>
+<p>User branches can be pushed to GitHub to enable collaboration and communication.
+Before offering unsolicited code review on your colleagues&#8217; user branches, remember that the work is intended to be an early prototype.</p>
+<p>Developers can feel free to rebase and force push work to their personal user branches.</p>
+</div>
+<div class="section" id="ticket-branches">
+<span id="git-branch-ticket"></span><h3>Ticket branches<a class="headerlink" href="#ticket-branches" title="Permalink to this headline">¶</a></h3>
+<p>Ticket branches are associated with a JIRA ticket.
+Only ticket branches can be merged into <code class="docutils literal"><span class="pre">master</span></code>.
+(In other words, developing on a ticket branch is the only way to record earned value for code development.)</p>
+<p>If the JIRA ticket is named <code class="docutils literal"><span class="pre">DM-NNNN</span></code>, then the ticket branch will be named</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>tickets/DM-NNNN
+</pre></div>
+</div>
+<p>A ticket branch can be made by branching off an existing user branch.
+This is a great way to formalize and shape experimental work into an LSST software contribution.</p>
+<p>When code on a ticket branch is ready for review and merging, follow the <a class="reference internal" href="#workflow-code-review"><span class="std std-ref">code review process documentation</span></a>.</p>
+</div>
+</div>
+<div class="section" id="review-preparation">
+<span id="id2"></span><h2>Review Preparation<a class="headerlink" href="#review-preparation" title="Permalink to this headline">¶</a></h2>
+<p>When development on your ticket branch is complete, we use a standard process for reviewing and merging your work.
+This section describes how to prepare your work for review.</p>
+<div class="section" id="pushing-code">
+<span id="workflow-pushing"></span><h3>Pushing code<a class="headerlink" href="#pushing-code" title="Permalink to this headline">¶</a></h3>
+<p>We recommend that you organize commits, improve commit messages, and ensure that your work is made against the latest commits on <code class="docutils literal"><span class="pre">master</span></code> with an <a class="reference external" href="https://help.github.com/articles/about-git-rebase/">interactive rebase</a>.
+A common pattern is:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git checkout master
+git pull
+git checkout tickets/DM-NNNN
+git rebase -i master
+<span class="c1"># interactive rebase</span>
+git push --force
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-with-jenkins">
+<span id="workflow-testing"></span><h3>Testing with Jenkins<a class="headerlink" href="#testing-with-jenkins" title="Permalink to this headline">¶</a></h3>
+<p>Use <a class="reference external" href="https://srs.slac.stanford.edu/hudson">Jenkins at srs.slac.stanford.edu/hudson</a> to run a build based on your branch work.
+To log into Jenkins, you&#8217;ll need to ask for an account from &lt;who?&gt;.</p>
+<p>Jenkins finds, builds, and tests your work according to the name of your ticket branch; Stack repositories lacking your ticket branch will fall back to <code class="docutils literal"><span class="pre">master</span></code>.</p>
+<div class="figure" id="id3">
+<img alt="_static/development/jenkins_ci.png" src="_static/development/jenkins_ci.png" />
+<p class="caption"><span class="caption-text">Jenkins test submission screen.
+In this example, the <code class="docutils literal"><span class="pre">tickets/DM-9999</span></code> branches of Stack repositories will be tested.
+If that branch doesn&#8217;t exist, the <code class="docutils literal"><span class="pre">tickets/DM-9998</span></code> branch is be used.
+If neither of those branches exist for a given repository, the <code class="docutils literal"><span class="pre">master</span></code> branch is used.</span></p>
+</div>
+<p>You can monitor builds in the <a class="reference external" href="https://fermi-lat.slack.com/messages/jenkins">#jenkins</a> Slack channel.
+<strong>If your build failed,</strong> click on the <strong>Console</strong> link in the Slack message to see the build.</p>
+</div>
+<div class="section" id="make-a-pull-request">
+<span id="workflow-pr"></span><h3>Make a pull request<a class="headerlink" href="#make-a-pull-request" title="Permalink to this headline">¶</a></h3>
+<p>On GitHub, <a class="reference external" href="https://help.github.com/articles/creating-a-pull-request/">create a pull request</a> for your branch.</p>
+<p>The pull request&#8217;s description shouldn&#8217;t be exhaustive; only include information that will help frame the review.</p>
+</div>
+</div>
+<div class="section" id="dm-code-review-and-merging-process">
+<span id="workflow-code-review"></span><h2>DM Code Review and Merging Process<a class="headerlink" href="#dm-code-review-and-merging-process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-scope-and-purpose-of-code-review">
+<span id="workflow-review-purpose"></span><h3>The scope and purpose of code review<a class="headerlink" href="#the-scope-and-purpose-of-code-review" title="Permalink to this headline">¶</a></h3>
+<p>We review work before it is merged to ensure that code is maintainable and usable by someone other than the author.</p>
+<ul class="simple">
+<li>Is the code well commented, structured for clarity, and consistent with DM&#8217;s code style?</li>
+<li>Is there adequate unit test coverage for the code?</li>
+<li>Is the documentation augmented or updated to be consistent with the code changes?</li>
+<li>Are the Git commits well organized and well annotated to help future developers understand the code development?</li>
+</ul>
+<p>Code reviews should also address whether the code fulfills design and performance requirements.</p>
+<p>Ideally the code review <em>should not be a design review.</em>
+Before serious coding effort is committed to a ticket, the developer should either undertake an informal design review while creating the JIRA story, or more formally use the <abbr title="Request for Comment">RFC</abbr> and <abbr title="Request for Discussion">RFD</abbr> processes (see <span class="xref doc">/processes/decision_process</span>) for key design decisions.</p>
+</div>
+<div class="section" id="assign-a-reviewer">
+<span id="workflow-review-assign"></span><h3>Assign a reviewer<a class="headerlink" href="#assign-a-reviewer" title="Permalink to this headline">¶</a></h3>
+<p>On your ticket&#8217;s JIRA page, use the <strong>Workflow</strong> button to switch the ticket&#8217;s state to <strong>In Review</strong>.
+JIRA will ask you to assign reviewers.</p>
+<p>In your JIRA message requesting review, indicate how involved the review work will be (&#8220;quick&#8221; or &#8220;not quick&#8221;).
+The reviewer should promptly acknowledge the request, indicate whether they can do the review, and give a timeline for when they will be able to accomplish the request.
+This allows the developer to seek an alternate reviewer if necessary.</p>
+<p>Any team member in Data Management can review code; it is perfectly fine to draw reviewers from any segment of DM.
+For major changes, it is good to choose someone more experienced than yourself.
+For minor changes, it may be good to choose someone less experienced than yourself.
+For large changes, more than one reviewer may be assigned, possibly split by area of the code.
+In this case, establish in the review request what each reviewer is responsible for.</p>
+<p><strong>Do not assign multiple reviewers as a way of finding someone to review your work more quickly.</strong>
+It is better to communicate directly with potential reviewers directly to ascertain their availability.</p>
+<p>Code reviews performed by peers are useful for a number of reasons:</p>
+<ul class="simple">
+<li>Peers are a good proxy for maintainability.</li>
+<li>It&#8217;s useful for everyone to be familiar with other parts of the system.</li>
+<li>Good practices can be spread; bad practices can be deprecated.</li>
+</ul>
+<p>All developers are expected to make time to perform reviews.
+The System Architect can intervene, however, if a developer is overburdened with review responsibility.</p>
+</div>
+<div class="section" id="code-review-discussion">
+<span id="workflow-code-review-process"></span><h3>Code review discussion<a class="headerlink" href="#code-review-discussion" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="using-github-pull-requests">
+<h4>Using GitHub pull requests<a class="headerlink" href="#using-github-pull-requests" title="Permalink to this headline">¶</a></h4>
+<p>Code review discussion should happen on the GitHub pull request, with the reviewer giving a discussion summary and conclusive thumbs-up on the JIRA ticket.</p>
+<p>When conducting an extensive code review in a PR, reviewers should use GitHub&#8217;s <a class="reference external" href="github-review">&#8220;Start a review&#8221; feature</a>.
+This mode lets the reviewer queue multiple comments that are only sent once the review is submitted.
+Note that GitHub allows a reviewer to classify a code review: &#8220;Comment,&#8221; &#8220;Approve,&#8221; or &#8220;Request changes.&#8221;
+While useful, this feature doesn&#8217;t replace JIRA for formally <a class="reference internal" href="#workflow-resolving-review"><span class="std std-ref">marking a ticket as being reviewed</span></a>.</p>
+<p>Reviewers should use GitHub&#8217;s <a class="reference external" href="https://help.github.com/articles/commenting-on-a-pull-request/#adding-line-comments-to-a-pull-request">line comments</a> to discuss specific pieces of code.
+As line comments are addressed, the developer may use GitHub&#8217;s <a class="reference external" href="https://help.github.com/articles/about-discussions-in-issues-and-pull-requests/">emoji reactions</a> to indicate that the work is done (the &#8220;👍&#8221; works well).
+Responding to each line comment isn&#8217;t required, but it can help a developer track progress in addressing comments.
+We discourage replies that merely say &#8220;Done&#8221; since <em>text</em> replies generate email traffic; emoji reactions aren&#8217;t emailed.
+Of course, use text replies if a discussion is required.</p>
+<div class="figure" id="id4">
+<img alt="_static/processes/workflow/reaction&#64;2x.gif" src="_static/processes/workflow/reaction&#64;2x.gif" />
+<p class="caption"><span class="caption-text">GitHub PR reactions are recommended for checking off completion of individual comments.</span></p>
+</div>
+<p>Another effective way to track progress towards addressing general review comments is with <a class="reference external" href="https://help.github.com/articles/about-task-lists/">Markdown task lists</a>.</p>
+</div>
+<div class="section" id="resolving-a-review">
+<span id="workflow-resolving-review"></span><h4>Resolving a review<a class="headerlink" href="#resolving-a-review" title="Permalink to this headline">¶</a></h4>
+<p>Code reviews are a collaborative check-and-improve process.
+Reviewers do not hold absolute authority, nor can developers ignore the reviewer&#8217;s suggestions.
+The aim is to discuss, iterate, and improve the pull request until the work is ready to be deployed on <code class="docutils literal"><span class="pre">master</span></code>.</p>
+<p>If the review becomes stuck on a design decision, that aspect of the review can be elevated into an RFC to seek team-wide consensus.</p>
+<p>If an issue is outside the ticket&#8217;s scope, the reviewer should file a new ticket.</p>
+<p>Once the iterative review process is complete, the reviewer should switch the JIRA ticket&#8217;s state to <strong>Reviewed</strong>.</p>
+<p>Note that in many cases the reviewer will mark a ticket as <strong>Reviewed</strong> before seeing the requested changes implemented.
+This convention is used when the review comments are non-controversial; the developer can simply implement the necessary changes and self-merge.
+The reviewer does not need to be consulted for final approval in this case.</p>
+</div>
+<div class="section" id="resolving-with-multiple-reviewers">
+<h4>Resolving with multiple reviewers<a class="headerlink" href="#resolving-with-multiple-reviewers" title="Permalink to this headline">¶</a></h4>
+<p>If there are multiple reviewers, our convention is that each review removes their name from the Reviewers list to indicate sign-off; the final reviewer switches the status to <strong>Reviewed.</strong>
+This indicates the ticket is ready to be merged.</p>
+</div>
+</div>
+<div class="section" id="merging">
+<span id="workflow-code-review-merge"></span><h3>Merging<a class="headerlink" href="#merging" title="Permalink to this headline">¶</a></h3>
+<p>Putting a ticket in a <strong>Reviewed</strong> state gives the developer the go-ahead to merge the ticket branch.
+If it has not been done already, the developer should rebase the ticket branch against the latest master.
+During this rebase, we recommend squashing any fixup commits into the main commit implementing that feature.
+Git commit history should not record the iterative improvements from code review.
+If a rebase was required, a final check with Jenkins should be done.</p>
+<p>We <strong>always use non-fast forward merges</strong> so that the merge point is marked in Git history, with the merge commit containing the ticket number:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git checkout master
+git pull  <span class="c1"># Sanity check; rebase ticket if master was updated.</span>
+git merge --no-ff tickets/DM-NNNN
+git push
+</pre></div>
+</div>
+<p><strong>GitHub pull request pages also offer a &#8216;big green button&#8217; for merging a branch to master</strong>.
+We discourage you from using this button since there isn&#8217;t a convenient way of knowing that the merged development history graph will be linear from GitHub&#8217;s interface.
+Rebasing the ticket branch against <code class="docutils literal"><span class="pre">master</span></code> and doing the non-fast forward merging on the command line is the safest workflow.</p>
+<p>The ticket branch <strong>should not</strong> be deleted from the GitHub remote.</p>
+<div class="section" id="fixing-a-breakage-on-master">
+<span id="workflow-fixing-breakage-master"></span><h4>Fixing a breakage on master<a class="headerlink" href="#fixing-a-breakage-on-master" title="Permalink to this headline">¶</a></h4>
+<p>In rare cases, despite the pre-merge integration testing process described <a class="reference internal" href="#workflow-testing"><span class="std std-ref">above</span></a>, a merge to master might accidentally contain an error and &#8220;break the build&#8221;.
+If this occurs, the merge may be reverted by anyone who notices the breakage and verifies that the merge is the cause &#8211; unless a fix can be created, tested, reviewed, and merged very promptly.</p>
+</div>
+</div>
+<div class="section" id="announce-the-change">
+<span id="workflow-announce"></span><h3>Announce the change<a class="headerlink" href="#announce-the-change" title="Permalink to this headline">¶</a></h3>
+<p>Once the merge has been completed, the developer should mark the JIRA ticket as <strong>Done</strong>.
+If this ticket adds a significant feature or fixes a significant bug, it should be announced in the <a class="reference external" href="https://community.lsst.org/c/dm/dm-notifications">DM Notifications category</a> of community.lsst.org with tag <a class="reference external" href="https://community.lsst.org/tags/dm-dev">dm-dev</a>.
+In addition, if this update affects users, a short description of its effects from the user point of view should be prepared for the release notes that accompany each major release.
+(Release notes are currently collected via team-specific procedures.)</p>
+</div>
+</div>
+<div class="section" id="appendix-commit-organization-best-practices">
+<span id="git-commit-organization-best-practices"></span><h2>Appendix: Commit Organization Best Practices<a class="headerlink" href="#appendix-commit-organization-best-practices" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="commits-should-represent-discrete-logical-changes-to-the-code">
+<span id="git-commit-organization-logical-units"></span><h3>Commits should represent discrete logical changes to the code<a class="headerlink" href="#commits-should-represent-discrete-logical-changes-to-the-code" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://wiki.openstack.org/wiki/GitCommitMessages#Structural_split_of_changes">OpenStack has an excellent discussion of commit best practices</a>; this is recommended reading for all DM developers.
+This section summarizes those recommendations.</p>
+<p>Commits on a ticket branch should be organized into discrete, self-contained units of change.
+In general, we encourage you to err on the side of more granular commits; squashing a pull request into a single commit is an anti-pattern.
+A good rule-of-thumb is that if your commit <em>summary</em> message needs to contain the word &#8216;and,&#8217; there are too many things happening in that commit.</p>
+<p>Associating commits to a single logical change makes debugging and code audits easier:</p>
+<ul class="simple">
+<li>Git bisect is more effective for zeroing in on the change that introduced a regression.</li>
+<li>Git blame is more helpful for explaining why a change was made.</li>
+<li>Better commit organization guides reviewers through your pull request, making for more effective code reviews.</li>
+<li>A bad commit can more easily be reverted later with fewer side-effects.</li>
+</ul>
+<p>Some edits serve only to fix white space or code style issues in existing code.
+Those whitespace and style fixes should be made in separate commits from new development.
+Usually it makes sense to fix whitespace and style issues in code <em>before</em> embarking on new development (or rebase those fixes to the beginning of your ticket branch).</p>
+</div>
+<div class="section" id="rebase-commits-from-code-reviews-rather-than-having-review-feedback-commits">
+<h3>Rebase commits from code reviews rather than having &#8216;review feedback&#8217; commits<a class="headerlink" href="#rebase-commits-from-code-reviews-rather-than-having-review-feedback-commits" title="Permalink to this headline">¶</a></h3>
+<p>Code review will result in additional commits that address code style, documentation and implementation issues.
+Authors should rebase (i.e., <code class="docutils literal"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">-i</span> <span class="pre">master</span></code>) their ticket branch to squash the post-review fixes to the pre-review commits.
+The end-goal is that a pull request, when merged, should have a coherent development story and look as if the code was written correctly the first time.</p>
+<p>There is <em>no need</em> to retain post-review commits in order to preserve code review discussions.
+So long as comments are made in the &#8216;Conversation&#8217; and &#8216;Files changed&#8217; tabs of the pull request GitHub will preserve that content.</p>
+</div>
+</div>
+<div class="section" id="appendix-commit-message-best-practices">
+<span id="git-commit-message-best-practices"></span><h2>Appendix: Commit Message Best Practices<a class="headerlink" href="#appendix-commit-message-best-practices" title="Permalink to this headline">¶</a></h2>
+<p>Generally you should write your commit messages in an editor, not at the prompt.
+Reserve the <code class="docutils literal"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;messsage&quot;</span></code> pattern for &#8216;work in progress&#8217; commits that will be rebased before code review.</p>
+<p>We follow standard conventions for Git commit messages, which consist of a short summary line followed by body of discussion.
+<a class="reference external" href="http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html">Tim Pope wrote about commit message formatting</a>.</p>
+<div class="section" id="writing-commit-summary-lines">
+<span id="git-commit-message-summary"></span><h3>Writing commit summary lines<a class="headerlink" href="#writing-commit-summary-lines" title="Permalink to this headline">¶</a></h3>
+<p><strong>Messages start with a single-line summary of 50 characters or less</strong>.
+Consider 50 characters as a hard limit; your summary will be truncated in the  GitHub UI otherwise.
+Write the message in the <strong>imperative</strong> tense, not the past tense.
+For example, &#8220;Add feature ...&#8221; and &#8220;Fix issue ...&#8221; rather than &#8220;Added feature...&#8221; and &#8220;Fixed feature....&#8221;
+Ensure the summary line contains the right keywords so that someone examining <a class="reference external" href="https://github.com/lsst/afw/commits/master">a commit listing</a> can understand what parts of the codebase are being changed.
+For example, it is useful to prefix the commit summary with the area of code being addressed.</p>
+</div>
+<div class="section" id="writing-commit-message-body-content">
+<span id="git-commit-message-body"></span><h3>Writing commit message body content<a class="headerlink" href="#writing-commit-message-body-content" title="Permalink to this headline">¶</a></h3>
+<p><strong>The message body should be wrapped at 72 character line lengths</strong>, and contain lists or paragraphs that explain the code changes.
+The commit message body describes:</p>
+<ul class="simple">
+<li>What the original issue was; the reader shouldn&#8217;t have to look at JIRA to understand what prompted the code change.</li>
+<li>What the changes actually are and why they were made.</li>
+<li>What the limitations of the code are. This is especially useful for future debugging.</li>
+</ul>
+<p>Git commit messages <em>are not</em> used to document the code and tell the reader how to use it.
+Documentation belongs in code comments, docstrings and documentation files.</p>
+<p>If the commit is trivial, a multi-line commit message may not be necessary.
+Conversely, a long message might suggest that the <a class="reference internal" href="#git-commit-organization-best-practices"><span class="std std-ref">commit should be split</span></a>.
+The code reviewer is responsible for giving feedback on the adequacy of commit messages.</p>
+<p>The <a class="reference external" href="https://wiki.openstack.org/wiki/GitCommitMessages#Information_in_commit_messages">OpenStack docs have excellent thoughts on writing great commit messages</a>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Fermi Developer Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Fermi LAT Collaboration.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
