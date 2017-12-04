@@ -1,0 +1,520 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using SCons with Git Package Organization &mdash; Fermi Developer Documentation  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Fermi Developer Documentation  documentation" href="index.html"/>
+        <link rel="prev" title="Development Workflow with Git, GitHub, and Jenkins" href="workflow.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fermi Developer Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Processes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Development Workflow with Git, GitHub, and Jenkins</a></li>
+</ul>
+<p class="caption"><span class="caption-text">SCons</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using SCons with Git Package Organization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-your-work-area">Creating Your Work Area</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acquiring-fermi-source">Acquiring Fermi source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#externals">Externals</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#typical-scons-build-commands-and-their-output">Typical SCons Build Commands and Their Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-all">Building &#8220;all&#8221;</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-output">The output</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#building-something-else">Building something else</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-supersede">Using &#8211;supersede</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-the-installation">Setting up the installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-with-supersede">Building with supersede</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scons-options">SCons options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#some-useful-options">Some useful options</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-scons-at-slac">Using SCons at SLAC</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Fermi Developer Documentation</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Using SCons with Git Package Organization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/scons.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-scons-with-git-package-organization">
+<h1>Using SCons with Git Package Organization<a class="headerlink" href="#using-scons-with-git-package-organization" title="Permalink to this headline">¶</a></h1>
+<p>This page describes use of SCons to build Fermi software under the new
+organization in which each package, such as Likelihood, is stored in its
+own GitHub repository.  It first covers the typical case of doing a
+complete build (target &#8220;all&#8221;) of a superpackage like ScienceTools.  Other
+topics include use of supersede area, making builds on public machines at
+SLAC, building targets other than &#8220;all&#8221;, and locally-defined SCons options.</p>
+<div class="section" id="creating-your-work-area">
+<h2>Creating Your Work Area<a class="headerlink" href="#creating-your-work-area" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<p>In order to do much of anything you need</p>
+<ul class="simple">
+<li>Git.  Version 1.9.5 or later is recommended</li>
+<li>SCons.  At least version 2.1.0</li>
+<li>You probably want repoman as well</li>
+</ul>
+</div>
+<div class="section" id="acquiring-fermi-source">
+<h3>Acquiring Fermi source<a class="headerlink" href="#acquiring-fermi-source" title="Permalink to this headline">¶</a></h3>
+<p>The most common method is to check out the full complement of packages
+belonging to the superpackage of interest (ScienceTools, ScienceTools_User
+or GlastRelease) via repoman.  See (reference here to workflow page,
+repoman section). Alternatively, you can check out the packages yourself
+with native git clone commands. This would be tedious in the extreme for a
+complete superpackage, but would be appropriate if you only need a few
+packages in a supersede area, to be built against a complete installation.
+In either case, you will first need a base directory.  cd there before
+invoking repoman or doing the git clones.</p>
+</div>
+<div class="section" id="externals">
+<h3>Externals<a class="headerlink" href="#externals" title="Permalink to this headline">¶</a></h3>
+<p>In order to build any of the &#8220;regular&#8221; targets you need access to include
+files, libraries, etc. for the proper versions of the externals required
+by the superpackage you intend to build.  How you acquire them is outside
+the scope of this document (though see discussion of &#8211;externalsList below
+for some help on discovering what you need). The required externals should
+be arranged as they are in the Fermi afs area at SLAC.  See
+e.g. /afs/slac/g/glast/ground/GLAST_EXT/redhat6-x86_64-64bit-gcc44
+Typically the environment variable GLAST_EXT is defined to point to such a
+directory (and such an assignment will be assumed in the rest of this
+document).</p>
+</div>
+</div>
+<div class="section" id="typical-scons-build-commands-and-their-output">
+<h2>Typical SCons Build Commands and Their Output<a class="headerlink" href="#typical-scons-build-commands-and-their-output" title="Permalink to this headline">¶</a></h2>
+<p>Note that SCons keeps track of dependencies.  If you ask for a particular
+build product, such as an executable, SCons will additionally rebuild any
+of its dependencies which are absent or out of date (e.g., an object file
+which is older than the corresponding source).</p>
+<div class="section" id="building-all">
+<h3>Building &#8220;all&#8221;<a class="headerlink" href="#building-all" title="Permalink to this headline">¶</a></h3>
+<p>Suppose</p>
+<ul class="simple">
+<li>you have used repoman to clone all the source for ScienceTools, under
+a directory called <strong>ST_root</strong></li>
+<li>SCons is in your path</li>
+<li>GLAST_EXT has been properly defined</li>
+</ul>
+<p>Then, if you cd to ST_root, you can build everything with the command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>scons -C ScienceTools --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT all
+</pre></div>
+</div>
+<p>If your current working directory is something else, the value for the -C
+option should be the path to ST_root/ScienceTools (absolute or relative
+from wherever you are).
+Nothing else changes. In particular, the value for &#8211;site-dir doesn&#8217;t change
+because it&#8217;s relative to the directory specified by -C.</p>
+<div class="section" id="the-output">
+<h4>The output<a class="headerlink" href="#the-output" title="Permalink to this headline">¶</a></h4>
+<p>SCons will create (if they don&#8217;t already exist) several directories under
+ST_root for build products meant to be public.  Exactly which directories
+are created depends somewhat on the superpackage being built, but they
+always include <strong>bin</strong>, <strong>lib</strong>, <strong>exe</strong> and <strong>include</strong>.  The immediate
+results of compile, link, etc., operations are written to a directory
+<strong>build</strong> (or a subdirectory) under the package owning the source. Anything
+needed for running a program or for building some other package which
+depends on the current package (such as public include files or libraries)
+is copied to one of the directories under ST_root.</p>
+</div>
+</div>
+<div class="section" id="building-something-else">
+<h3>Building something else<a class="headerlink" href="#building-something-else" title="Permalink to this headline">¶</a></h3>
+<p>The command is nearly the same as above; just replace <strong>all</strong> with the target
+name.  Note that, as for <strong>all</strong>, you must include the &#8211;with-GLAST-EXT
+option for all of the following:</p>
+<dl class="docutils">
+<dt>libraries</dt>
+<dd>Builds all libraries that would have gotten built by <strong>all</strong>; that is,
+contents of <strong>lib</strong></dd>
+<dt>binaries</dt>
+<dd>Builds contents of <strong>bin</strong> and <strong>exe</strong> (and all dependencies)</dd>
+<dt>include</dt>
+<dd>Installs all public include files under <strong>include</strong></dd>
+<dt>Likelihood</dt>
+<dd>Builds all libraries, test programs, etc., specified in the Likelihood
+SConscript.  Any other package name is similarly treated as a target</dd>
+<dt>Likelihood-libraries</dt>
+<dd>Builds libraries (and their dependencies) for Likelihood, but not executables.</dd>
+<dt>NoTarget</dt>
+<dd>Builds nothing at all, but will fail if there are any errors in
+SConscripts or any other files SCons uses to determine how to build
+real targets.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="using-supersede">
+<h2>Using &#8211;supersede<a class="headerlink" href="#using-supersede" title="Permalink to this headline">¶</a></h2>
+<p>If you&#8217;re a developer who only needs to modify packages at the top of the
+hierarchy (packages which are not dependencies for other packages) or near
+the top, build times will be shorter if you make use of the &#8211;supersede option.
+In the discussion below for concreteness it is assumed that the superpackage
+of interest is ScienceTools, but the same procedure will work for any
+superpackage.</p>
+<div class="section" id="setting-up-the-installation">
+<h3>Setting up the installation<a class="headerlink" href="#setting-up-the-installation" title="Permalink to this headline">¶</a></h3>
+<p>You&#8217;ll need all the build products (binaries, libraries, public includes,
+etc.)  of the release you wish to build against in the organization SCons
+expects to find.  Suppose you decide to put it under a directory
+<strong>base_root</strong>.  You can cd to that directory and check out source using
+repoman and build it yourself, using the instructions above to build &#8220;all&#8221;.
+Or you may be able to obtain a user tarball and unpack.  Such a tarball
+contains <em>only</em> public build products; it does not contain source.</p>
+<p>Next you need a place to put the packages you&#8217;ll be modifying (and any
+packages using them if some package you are modifying is not at the top
+of the hierarchy).  Create a directory, say <strong>supersede_root</strong>, which is
+independent of <strong>base_root</strong> (neither is under the other).  cd there
+and do a git checkout of all the packages you need.    For each package
+you intend to change you will probably want to make a branch and develop
+on that branch.  It will simplify later operations if all the branches have
+the same name.</p>
+</div>
+<div class="section" id="building-with-supersede">
+<h3>Building with supersede<a class="headerlink" href="#building-with-supersede" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s assume you have made changes to Likelihood and wish to build it.
+cd to <strong>supersede_root</strong> (maybe not strictly necessary, but at least
+avoid a working directory under <strong>base_root</strong>) and issue a command like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>scons -C &lt;absolute-path-to-base_root/ScienceTools&gt;
+   --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT
+   --supersede=&lt;absolute-path-to-supersede_root&gt; Likelihood
+</pre></div>
+</div>
+<p>scons will use Likelihood source in your supersede area and will install
+build products there as well.</p>
+</div>
+</div>
+<div class="section" id="scons-options">
+<h2>SCons options<a class="headerlink" href="#scons-options" title="Permalink to this headline">¶</a></h2>
+<p>To see all the standard options, just type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>For Fermi we have added several local options, such as &#8211;with-GLAST-EXT
+and &#8211;supersede.  To see documentation for all of these, cd to the root
+of an installation (suppose it&#8217;s of ScienceTools) and give the command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">C</span> <span class="n">ScienceTools</span> <span class="o">--</span><span class="n">site</span><span class="o">-</span><span class="nb">dir</span><span class="o">=../</span><span class="n">SConsShared</span><span class="o">/</span><span class="n">site_scons</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>or, from anywhere</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">scons</span> <span class="o">-</span><span class="n">C</span> <span class="o">&lt;</span><span class="n">absolute</span><span class="o">-</span><span class="n">path</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">ScienceTools</span><span class="o">-</span><span class="n">package</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">site</span><span class="o">-</span><span class="nb">dir</span><span class="o">=../</span><span class="n">SConsShared</span><span class="o">/</span><span class="n">site_scons</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<div class="section" id="some-useful-options">
+<h3>Some useful options<a class="headerlink" href="#some-useful-options" title="Permalink to this headline">¶</a></h3>
+<p>The following are standard SCons options:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-k</span></kbd></td>
+<td>Keep going (i.e., do not quit when an error is found)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--clean</span></kbd></td>
+<td>Remove specified targets and dependencies</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c</span></kbd></td>
+<td>Same as &#8211;clean</td></tr>
+</tbody>
+</table>
+<p>These are locally defined for Fermi:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--with-GLAST-EXT=<var>DIR</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Where to find externals. Required whenever building
+or cleaning &#8220;normal&#8221; targets, e.g. ones involving
+compile.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--ccflags=<var>FLAGS</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Pass these (additional) flags to C and C++ compiles</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--cxxflags=<var>FLAGS</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Pass these (additional) flags to C++ compiles</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--supersede=<var>DIR</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Root of supersede directory</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--rm</span></kbd></td>
+<td>Output at end of output indicating where problems
+occurred. Should be used with -k</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--externalsList=<var>FILE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Create file in data directory listing all externals
+required to build &#8220;all&#8221;.  Do not specify
+&#8211;with-GLAST-EXT when using this option. FILE defaults
+to externals.extList</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--user-release=<var>FILE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Creates tarball of build products. Build must have
+already been run.  Do not specify &#8211;with-GLAST-EXT
+when using this option.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--source-release=<var>FILE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Creates tarball of source, as if it had been checked
+out with repoman. Do not specify &#8211;with-GLAST-EXT
+when using this option.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--devel-release=<var>FILE</var></span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Creates tarball of build products plus source.
+Build must have already been run.  Do not specify
+&#8211;with-GLAST-EXT when using this option.</td></tr>
+</tbody>
+</table>
+<p>For the complete list of standard and local options, issue the &#8211;help
+command as described above.</p>
+</div>
+</div>
+<div class="section" id="using-scons-at-slac">
+<h2>Using SCons at SLAC<a class="headerlink" href="#using-scons-at-slac" title="Permalink to this headline">¶</a></h2>
+<p>Certain things are done for you if you&#8217;re on a SLAC public machine.</p>
+<ol class="arabic">
+<li><p class="first">Externals are already installed.  You can define the environment variable
+GLAST_EXT to be</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">afs</span><span class="o">/</span><span class="n">slac</span><span class="o">/</span><span class="n">g</span><span class="o">/</span><span class="n">glast</span><span class="o">/</span><span class="n">ground</span><span class="o">/</span><span class="n">GLAST_EXT</span><span class="o">/&lt;</span><span class="n">variant</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where &lt;variant&gt; depends on the OS of the machine you&#8217;re logged into. For
+redhat 6 &lt;variant&gt; should be <code class="docutils literal"><span class="pre">redhat6-x86_64-64bit-gcc44</span></code></p>
+</li>
+<li><p class="first">scons version 2.1 is installed, but is unfortunately not the default.
+You can find it at</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">afs</span><span class="o">/</span><span class="n">slac</span><span class="o">/</span><span class="n">g</span><span class="o">/</span><span class="n">glast</span><span class="o">/</span><span class="n">applications</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="nd">@sys</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">scons</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Old release builds (in case you want to use them as a base for work using
+&#8211;supersede) can be found on nfs.  Whether the Jenkins builds will also
+be copied to a disk accessible from SLAC public machines is yet to be
+determined.</p>
+</li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="workflow.html" class="btn btn-neutral" title="Development Workflow with Git, GitHub, and Jenkins" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Fermi LAT Collaboration.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
