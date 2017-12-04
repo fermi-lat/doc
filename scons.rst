@@ -94,7 +94,7 @@ libraries
   contents of **lib**
 
 binaries
-  Builds contents of **bin** and **exe**
+  Builds contents of **bin** and **exe** (and all dependencies)
 
 include
   Installs all public include files under **include**
@@ -104,7 +104,7 @@ Likelihood
   SConscript.  Any other package name is similarly treated as a target
 
 Likelihood-libraries
-  Builds libraries (and dependencies) for Likelihood, but not executables.
+  Builds libraries (and their dependencies) for Likelihood, but not executables.
 
 NoTarget
   Builds nothing at all, but will fail if there are any errors in 
@@ -122,21 +122,21 @@ superpackage.
 
 Setting up the installation
 ---------------------------
-You'll need all the build products (binaries, libraries, public includes, etc.)
-of the release you wish to build against in the organization SCons expects
-to find.  Suppose you put it under a directory **base\_root**.  You can
-check out source using repoman and build it yourself, using the instructions
-above to build "all".  Or you may be able to obtain a user tarball and unpack. 
-Such a tarball contains *only* public build products; it does not contain 
-source.
+You'll need all the build products (binaries, libraries, public includes,
+etc.)  of the release you wish to build against in the organization SCons
+expects to find.  Suppose you decide to put it under a directory
+**base\_root**.  You can cd to that directory and check out source using
+repoman and build it yourself, using the instructions above to build "all".
+Or you may be able to obtain a user tarball and unpack.  Such a tarball
+contains *only* public build products; it does not contain source.
 
-Next you need a place to put the packages you'll be developing (and any
+Next you need a place to put the packages you'll be modifying (and any
 packages using them if some package you are modifying is not at the top
 of the hierarchy).  Create a directory, say **supersede\_root**, which is
 independent of **base\_root** (neither is under the other).  cd there
 and do a git checkout of all the packages you need.    For each package
 you intend to change you will probably want to make a branch and develop
-on that branch.  To simplify later operations, all the branches should have
+on that branch.  It will simplify later operations if all the branches have
 the same name.
 
 Building with supersede
@@ -145,7 +145,7 @@ Let's assume you have made changes to Likelihood and wish to build it.
 cd to **supersede\_root** (maybe not strictly necessary, but at least
 avoid a working directory under **base\_root**) and issue a command like this::
 
-  scons -C <absolute path to base\_root/ScienceTools> --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT --supersede=<absolute path to supersede\_root> Likelihood
+  scons -C <absolute-path-to-base_root/ScienceTools> --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT --supersede=<absolute-path-to-supersede_root> Likelihood
 
 scons will use Likelihood source in your supersede area and will install
 build products there as well.
@@ -166,7 +166,7 @@ of an installation (suppose it's of ScienceTools) and give the command::
 or, from anywhere
 ::
 
-  scons -C <absolute path to ScienceTools package> --site-dir=../SConsShared/site_scons --help
+  scons -C <absolute-path-to-ScienceTools-package> --site-dir=../SConsShared/site_scons --help
 
 Some useful options
 -------------------
@@ -178,12 +178,14 @@ The following are standard SCons options:
 
 These are locally defined for Fermi:
 
---with-GLAST-EXT=DIR   Where to find externals
+--with-GLAST-EXT=DIR   Where to find externals. Required whenever building
+                       or cleaning "normal" targets, e.g. ones involving 
+                       compile.
 --ccflags=FLAGS        Pass these (additional) flags to C and C++ compiles
 --cxxflags=FLAGS       Pass these (additional) flags to C++ compiles
 --supersede=DIR        Root of supersede directory
---rm                   Output at end of log indicating where problems occurred
-                       Should be used with -k
+--rm                   Output at end of output indicating where problems 
+                       occurred. Should be used with -k
 --externalsList=FILE   Create file in data directory listing all externals
                        required to build "all".  Do not specify 
                        --with-GLAST-EXT when using this option. FILE defaults
@@ -198,6 +200,9 @@ These are locally defined for Fermi:
                        Build must have already been run.  Do not specify 
                        --with-GLAST-EXT when using this option.
 
+For the complete list of standard and local options, issue the --help
+command as described above.
+
 
 Using SCons at SLAC
 ===================
@@ -211,8 +216,10 @@ Certain things are done for you if you're on a SLAC public machine.
    where <variant> depends on the OS of the machine you're logged into. For
    redhat 6 <variant> should be ``redhat6-x86_64-64bit-gcc44``
 
-2. scons version 2.1 is installed (but is unfortunately not the default).
-   You can find it at ``/afs/slac/g/glast/applications/install/@sys/usr/bin/scons``
+2. scons version 2.1 is installed, but is unfortunately not the default.
+   You can find it at 
+   ::
+       /afs/slac/g/glast/applications/install/@sys/usr/bin/scons
 
 3. Old release builds (in case you want to use them as a base for work using
    --supersede) can be found on nfs.  Whether the Jenkins builds will also
