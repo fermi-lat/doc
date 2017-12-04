@@ -145,7 +145,9 @@ Let's assume you have made changes to Likelihood and wish to build it.
 cd to **supersede\_root** (maybe not strictly necessary, but at least
 avoid a working directory under **base\_root**) and issue a command like this::
 
-  scons -C <absolute-path-to-base_root/ScienceTools> --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT --supersede=<absolute-path-to-supersede_root> Likelihood
+  scons -C <absolute-path-to-base_root/ScienceTools> 
+     --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT 
+     --supersede=<absolute-path-to-supersede_root> Likelihood
 
 scons will use Likelihood source in your supersede area and will install
 build products there as well.
