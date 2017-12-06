@@ -17,3 +17,10 @@ Fermi Developer Guide
 
    workflow.rst
 
+.. toctree::
+   :maxdepth: 1
+   :caption: SCons
+   :name:  part-scons
+
+   scons.rst
+
