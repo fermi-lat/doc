@@ -17,6 +17,29 @@ Prerequisites on RHEL6
 Building against a GlastRelease Build
 --------------------------------------
 
+We maintain release builds in `/nfs/farm/g/glast/u52/repomanBuild/redhat6-x86_64-64bt-gcc44/GlastRelease`. For development, it is often easier to checkout the package(s) you are directly working on and build against an existing GR build. 
+
+- Create a work directory
+- Checkout your package(s) using git, i.e `git clone https://github.com/fermi-lat/TkrDigi.git`
+- cd into your package directory, i.e. `cd TkrDigi`
+- Create a branch for your development, `git checkout -b <branchName>`
+- Add your new branch to the remote git repo, `git push -u origin <branchName>`
+- Modify your code
+- Build against an existing GR build
+
+  scons -C <absolute-path-to-base_root/GlastRelease> 
+     --site-dir=../SConsShared/site_scons --with-GLAST-EXT=$GLAST_EXT 
+     --supersede=<absolute-path-to-supersede_root> TkrDigi
+     
+- When you are ready to commit your changes back to the remote repository
+  
+  git add <fileNames>
+  
+  git commit -m"Commit Message"
+  
+  git push
+  
+References
 
 
 Building GlastRelease 
@@ -34,4 +57,4 @@ This will checkout all of GlastRelease and its subpackages, using the L1 branch 
 Building the L1 branch of GR
 ############################
 
-``/afs/slac/g/glast/applications/SCons/2.1.0/bin/scons -C GlastRelease --with-GLAST-EXT=$GLAST_EXT --site-dir=../SConsShared/site_scons``
+``/afs/slac/g/glast/applications/SCons/2.1.0/bin/scons -C GlastRelease --with-GLAST-EXT=$GLAST_EXT --site-dir=../SConsShared/site_scons all``
