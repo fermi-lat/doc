@@ -19,7 +19,7 @@ Building against a GlastRelease Build
 
 We maintain release builds in `/nfs/farm/g/glast/u52/repomanBuild/redhat6-x86_64-64bt-gcc44/GlastRelease`. For development, it is often easier to checkout the package(s) you are directly working on and build against an existing GR build. 
 
-- Create a work directory
+- Create a local work directory
 - Checkout your package(s) using git, i.e `git clone https://github.com/fermi-lat/TkrDigi.git`
 - cd into your package directory, i.e. `cd TkrDigi`
 - Create a branch for your development, `git checkout -b <branchName>`
@@ -40,7 +40,11 @@ We maintain release builds in `/nfs/farm/g/glast/u52/repomanBuild/redhat6-x86_64
   git push
   
 References
+-----------
 
+`repoman <https://fermi-lat.github.io/repoman/>`_
+
+`scons <https://github.com/fermi-lat/doc/blob/master/scons.rst>`_
 
 Building GlastRelease 
 ---------------------
