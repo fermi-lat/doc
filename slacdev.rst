@@ -6,6 +6,7 @@ Prerequisites on RHEL6
 ----------------------
 
 - Git.  Version 1.9.5 or later is recommended  Available via ``scl enable git19 bash``
+- set GLAST_EXT ``/afs/slac/g/glast/ground/GLAST_EXT/redhat6-x86_64-64bit-gcc44``
 - SCons.  At least version 2.1.0 ``/afs/slac/g/glast/applications/SCons/2.1.0/bin/scons``
 - repoman. 
 
@@ -20,3 +21,8 @@ Checking out the L1 branch of GlastRelease from git using repoman
 - ``repoman checkout --bom GlastRelease L1``
 
 This will checkout all of GlastRelease and its subpackages, using the L1 branch when appropriate.  It will also create a repoman_bom.json file which lists all the git commit tags associated with every package.
+
+Building the L1 branch of GR
+-----------------------------
+
+``/afs/slac/g/glast/applications/SCons/2.1.0/bin/scons -C GlastRelease --with-GLAST-EXT=$GLAST_EXT --site-dir=../SConsShared/site_scons``
