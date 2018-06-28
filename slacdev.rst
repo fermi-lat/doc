@@ -58,7 +58,12 @@ Checking out the L1 branch of GlastRelease from git using repoman
 
 This will checkout all of GlastRelease and its subpackages, using the L1 branch when appropriate.  It will also create a repoman_bom.json file which lists all the git commit tags associated with every package.
 
-Building GlastRelease
-#######################
+Building GlastRelease Example
+#############################
 
 ``/afs/slac/g/glast/applications/SCons/2.1.0/bin/scons -C GlastRelease --with-GLAST-EXT=$GLAST_EXT --compile-opt --variant=redhat6-x86_64-64bit-gcc44-Optimized --site-dir=../SConsShared/site_scons all``
+
+Checking out a specific GlastRelease release tag
+################################################
+
+``repoman checkout --bom GlastRelease --force GlastRelease-20-10-04-gr04``
